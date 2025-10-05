@@ -2,72 +2,114 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Response;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    /**
+     * @return Response
+     */
+    public function index(): Response
     {
         $users = User::where('role', 'employee')->get();
         return Inertia::render('employee/index', ['users' => $users]);
     }
 
-    public function create()
+    /**
+     * @return Response
+     */
+    public function create(): Response
     {
         return Inertia::render('employee/create');
     }
 
-    public function store(Request $request)
+    /**
+     * @param StoreEmployeeRequest $request
+     * @return RedirectResponse
+     */
+    public function store(StoreEmployeeRequest $request): RedirectResponse
     {
+        try {
+            DB::transaction(function () use ($request) {
+                User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+            });
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+            return redirect()->route('employees.index')->with('success', 'Employee created successfully!');
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
 
-        return redirect()->route('employees.index')->with('success', 'Employee created successfully!');
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
+        }
     }
 
-    public function edit($id)
+    /**
+     * @param $user
+     * @return Response
+     */
+    public function edit($user): Response
     {
-        $employee = User::findOrFail($id);
+        $employee = User::findOrFail($user);
         return Inertia::render('employee/edit', compact('employee'));
     }
 
-    public function update(Request $request, $id)
+    /**
+     * @param UpdateEmployeeRequest $request
+     * @param $user
+     * @return RedirectResponse
+     */
+    public function update(UpdateEmployeeRequest $request, $user): RedirectResponse
     {
-        $user = User::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'nullable|string|min:6',
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password
-                ? Hash::make($request->password)
-                : $user->password,
-        ]);
-
-        return redirect()->route('employees.index')->with('success', 'Employee updated successfully!');
+        $user = User::findOrFail($user);
+        try {
+            DB::transaction(function () use ($request, $user) {
+                $user->update([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => $request->password
+                        ? Hash::make($request->password)
+                        : $user->password,
+                ]);
+            });
+            return redirect()->route('employees.index')->with('success', 'Employee updated successfully!');
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
+        }
     }
 
-    public function destroy($id)
+    /**
+     * @param $user
+     * @return RedirectResponse
+     */
+    public function destroy($user): RedirectResponse
     {
-        User::findOrFail($id)->delete();
-        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully!');
+        $user = User::findOrFail($user);
+        try {
+            DB::transaction(function () use ($user) {
+                $user->delete();
+            });
+            return redirect()->route('employees.index')->with('success', 'Employee deleted successfully!');
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
+        }
     }
 }
