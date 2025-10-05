@@ -43,9 +43,9 @@ Route::middleware(['auth', 'is-admin'])->prefix('shift')->controller(ShiftContro
     Route::get('/', 'index')->name('shift.index');
     Route::get('/create','create')->name('shift.create');
     Route::post('/','store')->name('shift.store');
-    Route::get('/{id}/edit','edit')->name('shift.edit');
-    Route::put('/{id}','update')->name('shift.update');
-    Route::delete('/{id}','destroy')->name('shift.destroy');
+    Route::get('/{shift}/edit','edit')->name('shift.edit');
+    Route::put('/{shift}','update')->name('shift.update');
+    Route::delete('/{shift}','destroy')->name('shift.destroy');
 });
 
 require __DIR__.'/settings.php';

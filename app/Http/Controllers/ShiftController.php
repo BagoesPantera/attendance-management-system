@@ -59,24 +59,22 @@ class ShiftController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     * @param $shift
+     * @param Shift $shift
      * @return Response
      */
-    public function edit($shift): Response
+    public function edit(Shift $shift): Response
     {
-        $shift = Shift::findOrFail($shift);
         return Inertia::render('shift/edit', compact('shift'));
     }
 
     /**
      * Update the specified resource in storage.
      * @param UpdateShiftRequest $request
-     * @param $shift
+     * @param Shift $shift
      * @return RedirectResponse
      */
-    public function update(UpdateShiftRequest $request, $shift): RedirectResponse
+    public function update(UpdateShiftRequest $request, Shift $shift): RedirectResponse
     {
-        $shift = Shift::findOrFail($shift);
         try {
             DB::transaction(function () use ($request, $shift) {
                 $shift->update([
@@ -97,12 +95,11 @@ class ShiftController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * @param $shift
+     * @param Shift $shift
      * @return RedirectResponse
      */
-    public function destroy($shift): RedirectResponse
+    public function destroy(Shift $shift): RedirectResponse
     {
-        $shift = Shift::findOrFail($shift);
         try {
             DB::transaction(function () use ($shift) {
                 $shift->delete();
