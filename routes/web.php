@@ -34,6 +34,9 @@ Route::middleware('auth')->controller(PlanningController::class)->prefix('planni
     Route::get('/', 'index')->name('planning.index');
     Route::get('/create','create')->name('planning.create');
     Route::post('/','store')->name('planning.store');
+    Route::get('/{planning}/edit','edit')->name('planning.edit');
+    Route::put('/{planning}','update')->name('planning.update');
+    Route::delete('/{planning}','destroy')->name('planning.destroy');
 });
 
 Route::middleware(['auth', 'is-admin'])->prefix('shift')->controller(ShiftController::class)->group(function () {

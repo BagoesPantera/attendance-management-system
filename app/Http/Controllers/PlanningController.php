@@ -2,47 +2,115 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePlanningRequest;
+use App\Http\Requests\UpdatePlanningRequest;
 use App\Models\Planning;
-use Illuminate\Http\Request;
+use App\Models\Shift;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PlanningController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * @return Response
+     */
+    public function index(): Response
     {
-        $user = $request->user();
-        if ($user->role === 'admin') {
-            $plannings = Planning::with('user')->latest()->paginate(20);
-        } else {
-            $plannings = $user->plannings()->latest()->paginate(20);
+        $plannings = Planning::with(['user', 'shift'])->where('user_id', Auth::id())->orderBy('date')->get();
+        return Inertia::render('planning/index', compact('plannings'));
+    }
+
+    /**
+     * @return Response
+     */
+    public function create(): Response
+    {
+        $shifts = Shift::all();
+        return Inertia::render('planning/create', compact('shifts'));
+    }
+
+    /**
+     * @param StorePlanningRequest $request
+     * @return RedirectResponse
+     */
+    public function store(StorePlanningRequest $request): RedirectResponse
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                Planning::create([
+                    'user_id' => Auth::id(),
+                    'shift_id' => $request->shift_id,
+                    'date' => $request->date,
+                    'note' => $request->note
+                ]);
+            });
+            return redirect()->route('planning.index')->with('success', 'Planning created successfully!');
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
+
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
         }
-        return Inertia::render('planning/index', ['plannings' => $plannings]);
     }
 
-    public function create()
+    /**
+     * @param Planning $planning
+     * @return Response|RedirectResponse
+     */
+    public function edit(Planning $planning): Response|RedirectResponse
     {
-        return Inertia::render('planning/create');
+        if ($planning->user_id !== Auth::id()) {
+            return redirect()->route('planning.index');
+        }
+        $shifts = Shift::all();
+        return Inertia::render('planning/edit', compact('planning', 'shifts'));
     }
 
-    public function store(Request $request)
+    /**
+     * @param UpdatePlanningRequest $request
+     * @param Planning $planning
+     * @return RedirectResponse
+     */
+    public function update(UpdatePlanningRequest $request, Planning $planning): RedirectResponse
     {
-        $request->validate([
-            'date' => 'required|date',
-            'planned_start' => 'required',
-            'planned_end' => 'required',
-        ]);
+        try {
+            DB::transaction(function () use ($request, $planning) {
+                $planning->update([
+                    'shift_id' => $request->shift_id,
+                    'date' => $request->date,
+                    'note' => $request->note
+                ]);
+            });
+            return redirect()->route('planning.index')->with('success', 'Planning updated successfully!');
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
 
-        $user = $request->user();
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
+        }
+    }
 
-        $planning = Planning::updateOrCreate(
-            ['user_id' => $user->id, 'date' => $request->date],
-            [
-                'planned_start' => $request->planned_start,
-                'planned_end' => $request->planned_end,
-                'note' => $request->note,
-            ]
-        );
-
-        return response()->json($planning, 201);
+    /**
+     * @param Planning $planning
+     * @return RedirectResponse
+     */
+    public function destroy(Planning $planning): RedirectResponse
+    {
+        try {
+            DB::transaction(function () use ($planning) {
+                $planning->delete();
+            });
+            return redirect()->route('planning.index')->with('success', 'Planning deleted successfully!');
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'SQLSTATE')) {
+                return redirect()->back()->withErrors(['msg' => 'GAGAL! Coba lagi']);
+            }
+            return redirect()->back()->withErrors(['msg' => 'Gagal: ' . $e->getMessage()]);
+        }
     }
 }

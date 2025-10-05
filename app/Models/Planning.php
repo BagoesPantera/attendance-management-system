@@ -11,7 +11,7 @@ class Planning extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','date','planned_start','planned_end','note'
+        'user_id','date','shift_id','note'
     ];
 
     protected $casts = [
@@ -21,5 +21,10 @@ class Planning extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 }

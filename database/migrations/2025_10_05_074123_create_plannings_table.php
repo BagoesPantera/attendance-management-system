@@ -14,13 +14,10 @@ return new class extends Migration
         Schema::create('plannings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('shift_id')->constrained()->onDelete('cascade');
             $table->date('date');
-            $table->time('planned_start');
-            $table->time('planned_end');
             $table->text('note')->nullable();
             $table->timestamps();
-
-            $table->unique(['user_id','date']);
         });
     }
 

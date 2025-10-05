@@ -16,7 +16,6 @@ export default function Edit({shift}){
 
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(shift.start_time);
         put(route('shift.update', shift.id))
     }
 

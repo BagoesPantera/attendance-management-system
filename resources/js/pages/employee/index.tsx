@@ -42,7 +42,7 @@ export default function Index({users}) {
                             <TableHead className="w-[100px]">No</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
-                            <TableHead>Method</TableHead>
+                            <TableHead>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({plannings}){
+    function handleEdit(id: number) {
+        router.visit(route('planning.edit', id));
+    }
+
+    function handleDelete(id: number) {
+        if (confirm('Yakin mau hapus?')) {
+            router.delete(route('planning.destroy', id));
+        }
+    }
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Planning" />
@@ -26,16 +35,16 @@ export default function Index({plannings}){
                 </div>
                 <Table>
                     {
-                        !plannings && (
+                        plannings && plannings.length > 0 && (
                             <TableCaption>A list of plannings</TableCaption>
                         )
                     }
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px]">No</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Method</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Shift</TableHead>
+                            <TableHead>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -44,8 +53,14 @@ export default function Index({plannings}){
                                 plannings.map((planning, i) => (
                                     <TableRow key={planning.id}>
                                         <TableCell className="font-medium">{i + 1}</TableCell>
-                                        <TableCell>{planning.name}</TableCell>
-                                        <TableCell>{planning.email}</TableCell>
+                                        <TableCell>
+                                            {planning.date ? new Date(planning.date).toLocaleDateString('id-ID', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric'
+                                            }) : '-'}
+                                        </TableCell>
+                                        <TableCell>{planning.shift.name} ({planning.shift.start_time.substring(0, 5)} - {planning.shift.end_time.substring(0, 5)})</TableCell>
                                         <TableCell>
                                             <Button className="mx-2" variant="outline" size="icon" onClick={() => handleEdit(planning.id)}>
                                                 <SquarePen />

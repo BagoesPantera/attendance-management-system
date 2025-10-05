@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UpdatePlanningRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdatePlanningRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -21,8 +23,29 @@ class UpdatePlanningRequest extends FormRequest
      */
     public function rules(): array
     {
+        $planning = $this->route('planning');
+
         return [
-            //
+            'date' => 'required|date|after_or_equal:today',
+            'shift_id' => [
+                'required',
+                'integer',
+                'exists:shifts,id',
+                Rule::unique('plannings')
+                    ->where(function ($query) {
+                        return $query->where('user_id', auth()->id())
+                            ->where('date', $this->date);
+                    })
+                    ->ignore($this->route('id'))
+            ],
+            'note' => 'nullable|string|max:500',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'shift_id.unique' => 'You have already made plans for this shift on the same date.',
         ];
     }
 }

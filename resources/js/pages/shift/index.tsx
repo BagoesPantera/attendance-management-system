@@ -35,7 +35,7 @@ export default function Index({shifts}){
                 </div>
                 <Table>
                     {
-                        !shifts && (
+                        shifts && shifts.length > 0 && (
                             <TableCaption>A list of Shifts</TableCaption>
                         )
                     }
@@ -55,8 +55,8 @@ export default function Index({shifts}){
                                     <TableRow key={shift.id}>
                                         <TableCell className="font-medium">{i + 1}</TableCell>
                                         <TableCell>{shift.name}</TableCell>
-                                        <TableCell>{shift.start_time}</TableCell>
-                                        <TableCell>{shift.end_time}</TableCell>
+                                        <TableCell>{shift.start_time.substring(0, 5)}</TableCell>
+                                        <TableCell>{shift.end_time.substring(0, 5)}</TableCell>
                                         <TableCell>
                                             <Button className="mx-2" variant="outline" size="icon" onClick={() => handleEdit(shift.id)}>
                                                 <SquarePen />

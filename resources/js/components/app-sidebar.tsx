@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, BookUser, Route } from 'lucide-react';
+import { LayoutGrid, BookUser, Route, CalendarClock } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -24,11 +24,6 @@ export function AppSidebar() {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
-        },
-        {
-            title: 'Planning',
-            href: route('planning.index'),
-            icon: Route,
         },
     ];
 
@@ -42,7 +37,17 @@ export function AppSidebar() {
             {
                 title: 'Shift',
                 href: route('shift.index'),
-                icon: BookUser,
+                icon: CalendarClock ,
+            },
+        );
+    }
+
+    if (auth.user.role === 'employee') {
+        mainNavItems.push(
+            {
+                title: 'Planning',
+                href: route('planning.index'),
+                icon: Route,
             },
         );
     }
