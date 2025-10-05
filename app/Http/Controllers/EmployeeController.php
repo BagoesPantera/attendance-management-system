@@ -57,23 +57,21 @@ class EmployeeController extends Controller
     }
 
     /**
-     * @param $user
+     * @param User $user
      * @return Response
      */
-    public function edit($user): Response
+    public function edit(User $user): Response
     {
-        $employee = User::findOrFail($user);
-        return Inertia::render('employee/edit', compact('employee'));
+        return Inertia::render('employee/edit', ['employee' => $user]);
     }
 
     /**
      * @param UpdateEmployeeRequest $request
-     * @param $user
+     * @param User $user
      * @return RedirectResponse
      */
-    public function update(UpdateEmployeeRequest $request, $user): RedirectResponse
+    public function update(UpdateEmployeeRequest $request, User $user): RedirectResponse
     {
-        $user = User::findOrFail($user);
         try {
             DB::transaction(function () use ($request, $user) {
                 $user->update([
@@ -94,12 +92,11 @@ class EmployeeController extends Controller
     }
 
     /**
-     * @param $user
+     * @param User $user
      * @return RedirectResponse
      */
-    public function destroy($user): RedirectResponse
+    public function destroy(User $user): RedirectResponse
     {
-        $user = User::findOrFail($user);
         try {
             DB::transaction(function () use ($user) {
                 $user->delete();

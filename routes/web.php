@@ -25,9 +25,9 @@ Route::middleware(['auth', 'is-admin'])->prefix('employees')->controller(Employe
     Route::get('/', 'index')->name('employees.index');
     Route::get('/create','create')->name('employees.create');
     Route::post('/','store')->name('employees.store');
-    Route::get('/{id}/edit','edit')->name('employees.edit');
-    Route::put('/{id}','update')->name('employees.update');
-    Route::delete('/{id}','destroy')->name('employees.destroy');
+    Route::get('/{user}/edit','edit')->name('employees.edit');
+    Route::put('/{user}','update')->name('employees.update');
+    Route::delete('/{user}','destroy')->name('employees.destroy');
 });
 
 Route::middleware('auth')->controller(PlanningController::class)->prefix('planning')->group(function () {
