@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PlanningController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +28,21 @@ Route::middleware(['auth', 'is-admin'])->prefix('employees')->controller(Employe
     Route::get('/{id}/edit','edit')->name('employees.edit');
     Route::put('/{id}','update')->name('employees.update');
     Route::delete('/{id}','destroy')->name('employees.destroy');
+});
+
+Route::middleware('auth')->controller(PlanningController::class)->prefix('planning')->group(function () {
+    Route::get('/', 'index')->name('planning.index');
+    Route::get('/create','create')->name('planning.create');
+    Route::post('/','store')->name('planning.store');
+});
+
+Route::middleware(['auth', 'is-admin'])->prefix('shift')->controller(ShiftController::class)->group(function () {
+    Route::get('/', 'index')->name('shift.index');
+    Route::get('/create','create')->name('shift.create');
+    Route::post('/','store')->name('shift.store');
+    Route::get('/{id}/edit','edit')->name('shift.edit');
+    Route::put('/{id}','update')->name('shift.update');
+    Route::delete('/{id}','destroy')->name('shift.destroy');
 });
 
 require __DIR__.'/settings.php';
