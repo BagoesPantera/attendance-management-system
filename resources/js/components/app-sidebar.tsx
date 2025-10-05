@@ -11,24 +11,36 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { type NavItem, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutGrid, BookUser } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-
-];
-
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (auth.user.role === 'admin') {
+        mainNavItems.push(
+            {
+                title: 'Employee',
+                href: route('employees.index'),
+                icon: BookUser,
+            },
+        );
+    }
+
+    const footerNavItems: NavItem[] = [
+        // footer items...
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
