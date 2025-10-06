@@ -6,6 +6,7 @@ use App\Http\Requests\StorePlanningRequest;
 use App\Http\Requests\UpdatePlanningRequest;
 use App\Models\Planning;
 use App\Models\Shift;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class PlanningController extends Controller
      */
     public function index(): Response
     {
-        $plannings = Planning::with(['user', 'shift'])->where('user_id', Auth::id())->orderBy('date')->get();
+        $plannings = Planning::with(['user', 'shift'])->where('user_id', Auth::id())->whereDate('date', '>=', Carbon::today())->orderBy('date')->get();
         return Inertia::render('planning/index', compact('plannings'));
     }
 
