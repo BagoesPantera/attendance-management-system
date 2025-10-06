@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Planning;
 use App\Models\ShiftAttendance;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,7 +14,27 @@ class DashboardController extends Controller
     public function index()
     {
         if (Auth::user()->role == 'admin'){
-            return Inertia::render('dashboard/admin', []);
+            $employeeCount = User::where('role', 'employee')->count();
+
+            $todayAttendance = ShiftAttendance::whereDate('start_at', Carbon::today())
+                ->distinct('user_id')
+                ->count('user_id');
+
+            $startOfWeek = Carbon::now()->copy()->startOfWeek(Carbon::MONDAY);
+            $endOfWeek = Carbon::now()->copy()->endOfWeek(Carbon::SUNDAY);
+            $weeklyShifts = ShiftAttendance::whereBetween('start_at', [$startOfWeek, $endOfWeek])->count();
+
+            $recentAttendances = ShiftAttendance::with(['user', 'planning.shift'])
+                ->latest()
+                ->take(10)
+                ->get();
+
+            return Inertia::render('dashboard/admin', [
+                'employeeCount' => $employeeCount,
+                'todayAttendance' => $todayAttendance,
+                'weeklyShifts' => $weeklyShifts,
+                'recentAttendances' => $recentAttendances,
+            ]);
         } else {
             $userId = Auth::id();
             $today = Carbon::today();
