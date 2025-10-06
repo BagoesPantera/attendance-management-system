@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PlanningController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ShiftAttendanceController;
 use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'is-admin'])->prefix('employees')->controller(Employe
     Route::get('/{user}/edit','edit')->name('employees.edit');
     Route::put('/{user}','update')->name('employees.update');
     Route::delete('/{user}','destroy')->name('employees.destroy');
+});
+
+Route::middleware(['auth'])->prefix('report')->controller(ReportController::class)->group(function () {
+    Route::get('/', 'index')->name('report.index');
 });
 
 Route::middleware('auth')->controller(PlanningController::class)->prefix('planning')->group(function () {

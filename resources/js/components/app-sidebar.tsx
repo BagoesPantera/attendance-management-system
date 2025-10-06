@@ -13,7 +13,13 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, BookUser, Route, CalendarClock } from 'lucide-react';
+import {
+    LayoutGrid,
+    BookUser,
+    Route,
+    CalendarClock,
+    CalendarDays,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -24,6 +30,11 @@ export function AppSidebar() {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: 'Report',
+            href: route('report.index'),
+            icon: CalendarDays,
         },
     ];
 
