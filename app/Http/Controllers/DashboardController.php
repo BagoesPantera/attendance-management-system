@@ -81,13 +81,17 @@ class DashboardController extends Controller
     public function startShift(Planning $planning)
     {
         $shiftStart = Carbon::parse($planning->date)->setTimeFromTimeString($planning->shift->start_time);
-
+        $shiftEnd = Carbon::parse($planning->date)->setTimeFromTimeString($planning->shift->end_time);
         $now = Carbon::now();
 
         $allowedStart = $shiftStart->copy()->subMinutes(5);
 
         if ($now->lt($allowedStart)) {
             return back()->with('error', 'You can only start your shift 5 minutes before the start time.');
+        }
+
+        if ($now->gt($shiftEnd)) {
+            return back()->with('error', 'You cannot start your shift after it has ended.');
         }
 
         $attendance = ShiftAttendance::firstOrCreate(
