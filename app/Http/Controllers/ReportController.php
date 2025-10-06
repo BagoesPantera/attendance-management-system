@@ -2,56 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ShiftAttendance;
+use App\Models\Planning;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request): Response
     {
         $user = Auth::user();
         $isAdmin = $user->role === 'admin';
 
-        // Default date filter (bulan ini)
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        // Kalau admin bisa pilih employee, kalau bukan -> pakai ID sendiri
         $employeeId = $isAdmin
             ? $request->input('employee_id')
             : $user->id;
 
-        // Query data dari ShiftAttendance
-        $query = ShiftAttendance::query()
-            ->whereBetween('start_at', [$startDate, $endDate])
+        $plannings = Planning::with(['user', 'shift', 'attendance'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->whereDate('date', '<=', now())
             ->when($employeeId, fn($q) => $q->where('user_id', $employeeId))
-            ->with('user');
+            ->get();
 
-        // Group dan kalkulasi
-        $report = $query
-            ->select(
-                'user_id',
-                DB::raw('COUNT(id) as total_shift'),
-                DB::raw('COUNT(DISTINCT DATE(start_at)) as total_days'),
-                DB::raw('SUM(TIMESTAMPDIFF(HOUR, start_at, end_at)) as total_hours')
-            )
-            ->groupBy('user_id')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'employee_name' => $item->user->name ?? 'Unknown',
-                    'total_shift' => $item->total_shift,
-                    'total_days' => $item->total_days,
-                    'total_hours' => $item->total_hours,
-                ];
-            });
+        $report = $plannings->map(function ($planning) {
+            $attendance = $planning->attendance;
 
-        // Hanya admin yang bisa lihat semua employee
+            $shiftStart = Carbon::parse($planning->date)->setTimeFromTimeString($planning->shift->start_time);
+            $shiftEnd = Carbon::parse($planning->date)->setTimeFromTimeString($planning->shift->end_time);
+
+            $status = 'Absent';
+            $isLate = false;
+            $earlyIn = false;
+            $earlyLeave = false;
+            $totalHours = 0;
+
+            if ($attendance) {
+                $status = 'Present';
+                $start = Carbon::parse($attendance->start_at);
+                $end = $attendance->end_at ? Carbon::parse($attendance->end_at) : null;
+
+                if ($shiftEnd->lessThanOrEqualTo($shiftStart)) {
+                    $shiftEnd->addDay();
+                }
+
+                if ($start->greaterThan($shiftStart)) {
+                    $isLate = true;
+                    $lateTime = $start->format('H:i');
+                } elseif ($start->lessThan($shiftStart)) {
+                    $earlyIn = true;
+                    $earlyInTime = $start->format('H:i');
+                }
+
+                if ($end && $end->lessThan($shiftEnd)) {
+                    $earlyLeave = true;
+                    $earlyLeaveTime = $end->format('H:i');
+                }
+
+                if ($end) {
+                    if ($end->lessThan($start)) {
+                        $end->addDay();
+                    }
+
+                    $totalHours = round($start->diffInMinutes($end) / 60, 2);
+                } else {
+                    $totalHours = 0;
+                }
+            }
+
+            return [
+                'date' => $planning->date,
+                'employee_name' => $planning->user->name,
+                'shift_name' => $planning->shift->name,
+                'shift_time' => $planning->shift->start_time . ' - ' . $planning->shift->end_time,
+                'status' => $status,
+                'is_late' => $isLate ? 'Yes (' . $lateTime . ')' : 'No',
+                'early_in' => $earlyIn ? 'Yes (' . $earlyInTime . ')' : 'No',
+                'early_leave' => $earlyLeave ? 'Yes (' . $earlyLeaveTime . ')' : 'No',
+                'total_hours' => $totalHours,
+            ];
+        });
+
         $employees = $isAdmin
             ? User::where('role', 'employee')->select('id', 'name')->orderBy('name')->get()
             : [];

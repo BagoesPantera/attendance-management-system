@@ -47,7 +47,6 @@ export default function Reports({ report, filters, employees, isAdmin }) {
         router.get(route('report.index'), params);
     };
 
-    // Format tanggal sekarang tanpa library
     const formatDateTime = (date) => {
         const d = new Date(date);
         return d.toLocaleString("en-GB", {
@@ -115,8 +114,9 @@ export default function Reports({ report, filters, employees, isAdmin }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Report Summary</CardTitle>
+                        <CardTitle>Shift Attendance Report</CardTitle>
                     </CardHeader>
+
                     <CardContent>
                         {report.length === 0 ? (
                             <p className="text-center text-muted-foreground py-6">
@@ -126,19 +126,67 @@ export default function Reports({ report, filters, employees, isAdmin }) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
+                                        <TableHead>Date</TableHead>
                                         <TableHead>Employee</TableHead>
-                                        <TableHead>Total Shifts</TableHead>
-                                        <TableHead>Total Days</TableHead>
+                                        <TableHead>Shift</TableHead>
+                                        <TableHead>Shift Time</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Late</TableHead>
+                                        <TableHead>Early In</TableHead>
+                                        <TableHead>Early Leave</TableHead>
                                         <TableHead>Total Hours</TableHead>
                                     </TableRow>
                                 </TableHeader>
+
                                 <TableBody>
                                     {report.map((r, i) => (
                                         <TableRow key={i}>
+                                            {/* Tanggal */}
+                                            <TableCell>
+                                                {r.date
+                                                    ? new Date(r.date).toLocaleDateString('id-ID', {
+                                                        day: '2-digit',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    })
+                                                    : '-'}
+                                            </TableCell>
                                             <TableCell>{r.employee_name}</TableCell>
-                                            <TableCell>{r.total_shift}</TableCell>
-                                            <TableCell>{r.total_days}</TableCell>
-                                            <TableCell>{r.total_hours ?? 0} hours</TableCell>
+                                            <TableCell>{r.shift_name ?? '-'}</TableCell>
+                                            <TableCell>{r.shift_time ?? '-'}</TableCell>
+                                            <TableCell>
+                                                {r.status === 'Absent' ? (
+                                                    <span className="text-red-500 font-medium">{r.status}</span>
+                                                ) : (
+                                                    <span className="text-green-600 font-medium">{r.status}</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {r.is_late && r.is_late !== 'No' ? (
+                                                    <span className="text-yellow-600 font-medium">{r.is_late}</span>
+                                                ) : (
+                                                    <span className="text-muted-foreground">No</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {r.early_in && r.early_in !== 'No' ? (
+                                                    <span className="text-blue-600 font-medium">{r.early_in}</span>
+                                                ) : (
+                                                    <span className="text-muted-foreground">No</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {r.early_leave && r.early_leave !== 'No' ? (
+                                                    <span className="text-orange-600 font-medium">{r.early_leave}</span>
+                                                ) : (
+                                                    <span className="text-muted-foreground">No</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {r.total_hours
+                                                    ? `${Number(r.total_hours).toFixed(2)}h`
+                                                    : '-'}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
