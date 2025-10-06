@@ -27,4 +27,10 @@ class Planning extends Model
     {
         return $this->belongsTo(Shift::class);
     }
+
+    public function attendance()
+    {
+        return $this->hasOne(ShiftAttendance::class);
+    }
+
 }
