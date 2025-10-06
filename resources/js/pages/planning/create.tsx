@@ -47,7 +47,7 @@ export default function Create({shifts}) {
             </div>
             <div className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Display error  */}
+
                     {Object.keys(errors).length > 0 &&(
                         <Alert variant="destructive">
                             <CircleAlert className="h-4 w-4" />
@@ -61,9 +61,10 @@ export default function Create({shifts}) {
                             </AlertDescription>
                         </Alert>
                     )}
+
                     <div className='gap-1.5'>
                         <Label htmlFor="date">Date</Label>
-                        <Input type="date" value={data.date} onChange={(e) => setData('date', e.target.value)}></Input>
+                        <Input type="date" value={data.date} onChange={(e) => setData('date', e.target.value)} min={new Date().toISOString().split('T')[0]}></Input>
                     </div>
 
                     <div className='gap-1.5'>
@@ -80,7 +81,7 @@ export default function Create({shifts}) {
                                     shifts && shifts.length > 0 && (
                                         shifts.map((shift) => (
                                         <SelectItem key={shift.id} value={shift.id.toString()}>
-                                            {shift.name} ({shift.start_time} - {shift.end_time})
+                                            {shift.name} ({shift.start_time.substring(0, 5)} - {shift.end_time.substring(0, 5)})
                                         </SelectItem>
                                     )))
                                 }

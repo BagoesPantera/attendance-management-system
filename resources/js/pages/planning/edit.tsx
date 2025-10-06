@@ -35,7 +35,7 @@ export default function Edit({ planning, shifts }) {
 
             <div className="p-6">
                 <form onSubmit={handleUpdate} className="space-y-4 max-w-md">
-                    {/* Display error */}
+
                     {Object.keys(errors).length > 0 &&(
                         <Alert variant="destructive">
                             <CircleAlert className="h-4 w-4" />
@@ -50,19 +50,15 @@ export default function Edit({ planning, shifts }) {
                         </Alert>
                     )}
 
-                    {/* Date Input */}
                     <div className='gap-1.5'>
                         <Label htmlFor="date">Date</Label>
                         <Input
                             type="date"
                             value={data.date}
                             onChange={(e) => setData('date', e.target.value)}
-                            min={new Date().toISOString().split('T')[0]} // Min date today
+                            min={new Date().toISOString().split('T')[0]}
                         />
-                        {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date}</div>}
                     </div>
-
-                    {/* Shift Select */}
                     <div className='gap-1.5'>
                         <Label htmlFor="shift">Shift</Label>
                         <Select
@@ -89,10 +85,7 @@ export default function Edit({ planning, shifts }) {
                                 )}
                             </SelectContent>
                         </Select>
-                        {errors.shift_id && <div className="text-red-500 text-sm mt-1">{errors.shift_id}</div>}
                     </div>
-
-                    {/* Note Textarea */}
                     <div className='gap-1.5'>
                         <Label htmlFor="note">Note (Optional)</Label>
                         <Textarea
@@ -101,7 +94,6 @@ export default function Edit({ planning, shifts }) {
                             onChange={(e) => setData('note', e.target.value)}
                             rows={4}
                         />
-                        {errors.note && <div className="text-red-500 text-sm mt-1">{errors.note}</div>}
                     </div>
 
                     <Button disabled={processing} type="submit">
