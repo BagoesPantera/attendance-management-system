@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { CircleAlert, CircleArrowLeft } from 'lucide-react';
+import { CircleArrowLeft } from 'lucide-react';
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -13,8 +13,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
+import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,23 +48,14 @@ export default function Create({shifts}) {
             <div className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
 
-                    {Object.keys(errors).length > 0 &&(
-                        <Alert variant="destructive">
-                            <CircleAlert className="h-4 w-4" />
-                            <AlertTitle>Errors!</AlertTitle>
-                            <AlertDescription>
-                                <ul>
-                                    {Object.entries(errors).map(([key, message]) => (
-                                        <li key={key}>{message as string}</li>
-                                    ))}
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
-                    )}
-
                     <div className='gap-1.5'>
                         <Label htmlFor="date">Date</Label>
-                        <Input type="date" value={data.date} onChange={(e) => setData('date', e.target.value)} min={new Date().toISOString().split('T')[0]}></Input>
+                        <Input
+                            type="date"
+                            value={data.date}
+                            onChange={(e) => setData('date', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}></Input>
+                        <InputError message={errors.date} />
                     </div>
 
                     <div className='gap-1.5'>
@@ -87,13 +78,20 @@ export default function Create({shifts}) {
                                 }
                             </SelectContent>
                         </Select>
+                        <InputError message={errors.shift_id}/>
                     </div>
 
                     <div className='gap-1.5'>
                         <Label htmlFor="note">Note (Optional)</Label>
-                        <Textarea placeholder="Description" value={data.note}  onChange={(e) => setData('note', e.target.value)}/>
+                        <Textarea
+                            placeholder="Description"
+                            value={data.note}
+                            onChange={(e) => setData('note', e.target.value)}/>
+                        <InputError message={errors.note} />
                     </div>
-                    <Button disabled={processing} type="submit">Create Planning</Button>
+                    <Button disabled={processing} type="submit">
+                        {processing ? 'Creating...' : 'Create Planning'}
+                    </Button>
                 </form>
             </div>
         </AppLayout>

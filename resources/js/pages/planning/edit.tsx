@@ -1,18 +1,18 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CircleAlert, CircleArrowLeft } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CircleArrowLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import InputError from '@/components/input-error';
 
 export default function Edit({ planning, shifts }) {
     const { data, setData, put, processing, errors } = useForm({
-        date: planning.date ? planning.date.split('T')[0] : '', // Format untuk input date
-        shift_id: planning.shift_id?.toString() || '', // Convert ke string
+        date: planning.date ? planning.date.split('T')[0] : '',
+        shift_id: planning.shift_id?.toString() || '',
         note: planning.note || '',
     });
 
@@ -35,21 +35,6 @@ export default function Edit({ planning, shifts }) {
 
             <div className="p-6">
                 <form onSubmit={handleUpdate} className="space-y-4 max-w-md">
-
-                    {Object.keys(errors).length > 0 &&(
-                        <Alert variant="destructive">
-                            <CircleAlert className="h-4 w-4" />
-                            <AlertTitle>Errors!</AlertTitle>
-                            <AlertDescription>
-                                <ul>
-                                    {Object.entries(errors).map(([key, message]) => (
-                                        <li key={key}>{message as string}</li>
-                                    ))}
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
-                    )}
-
                     <div className='gap-1.5'>
                         <Label htmlFor="date">Date</Label>
                         <Input
@@ -58,6 +43,7 @@ export default function Edit({ planning, shifts }) {
                             onChange={(e) => setData('date', e.target.value)}
                             min={new Date().toISOString().split('T')[0]}
                         />
+                        <InputError message={errors.date} />
                     </div>
                     <div className='gap-1.5'>
                         <Label htmlFor="shift">Shift</Label>
@@ -85,7 +71,9 @@ export default function Edit({ planning, shifts }) {
                                 )}
                             </SelectContent>
                         </Select>
+                        <InputError message={errors.shift_id} />
                     </div>
+
                     <div className='gap-1.5'>
                         <Label htmlFor="note">Note (Optional)</Label>
                         <Textarea
@@ -94,6 +82,7 @@ export default function Edit({ planning, shifts }) {
                             onChange={(e) => setData('note', e.target.value)}
                             rows={4}
                         />
+                        <InputError message={errors.note} />
                     </div>
 
                     <Button disabled={processing} type="submit">

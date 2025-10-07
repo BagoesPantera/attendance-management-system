@@ -2,11 +2,11 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { CircleAlert, CircleArrowLeft } from 'lucide-react';
+import { CircleArrowLeft } from 'lucide-react';
 import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,33 +40,33 @@ export default function Create(){
 
             <div className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Display error  */}
-                    {Object.keys(errors).length > 0 &&(
-                        <Alert variant="destructive">
-                            <CircleAlert className="h-4 w-4" />
-                            <AlertTitle>Errors!</AlertTitle>
-                            <AlertDescription>
-                                <ul>
-                                    {Object.entries(errors).map(([key, message]) => (
-                                        <li key={key}>{message as string}</li>
-                                    ))}
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
-                    )}
                     <div className='gap-1.5'>
-                        <Label htmlFor="employee name">Name</Label>
-                        <Input placeholder="Shift 1" value={data.name} onChange={(e) => setData('name', e.target.value)}></Input>
+                        <Label htmlFor="shift name">Name</Label>
+                        <Input
+                            placeholder="Shift 1"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)} />
+                        <InputError message={errors.name}/>
                     </div>
                     <div className='gap-1.5'>
-                        <Label htmlFor="employee price">Start Time</Label>
-                        <Input type="time" value={data.start_time} onChange={(e) => setData('start_time', e.target.value)}></Input>
+                        <Label htmlFor="start time">Start Time</Label>
+                        <Input
+                            type="time"
+                            value={data.start_time}
+                            onChange={(e) => setData('start_time', e.target.value)} />
+                        <InputError message={errors.start_time}/>
                     </div>
                     <div className='gap-1.5'>
-                        <Label htmlFor="employee password">End Time</Label>
-                        <Input type="time" value={data.end_time} onChange={(e) => setData('end_time', e.target.value)}></Input>
+                        <Label htmlFor="end time">End Time</Label>
+                        <Input
+                            type="time"
+                            value={data.end_time}
+                            onChange={(e) => setData('end_time', e.target.value)} />
+                        <InputError message={errors.end_time}/>
                     </div>
-                    <Button disabled={processing} type="submit">Create Shift</Button>
+                    <Button disabled={processing} type="submit">
+                        {processing ? 'Creating...' : 'Create Shift'}
+                    </Button>
                 </form>
             </div>
 
