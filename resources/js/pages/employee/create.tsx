@@ -1,8 +1,7 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { CircleArrowLeft } from 'lucide-react';
 import type { BreadcrumbItem } from '@/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,11 @@ import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create Employee',
+        title: 'Employee',
+        href: route('employees.index'),
+    },
+    {
+        title: '/',
         href: route('employees.create'),
     },
 ];
@@ -32,16 +35,12 @@ export default function Create() {
             <Head title="Create Employee" />
 
             <div className="m-3">
-                <Link href={route('employees.index')}>
-                    <Button variant="outline">
-                        <CircleArrowLeft  /> Back
-                    </Button>
-                </Link>
+                <p className="text-3xl font-bold">Create Employee</p>
             </div>
 
-            <div className="p-6">
+            <div className='w-8/12 p-4'>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="employee name">Name</Label>
                         <Input
                             placeholder="John"
@@ -49,7 +48,7 @@ export default function Create() {
                             onChange={(e) => setData('name', e.target.value)} />
                         <InputError message={errors.name} />
                     </div>
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="employee email">Email</Label>
                         <Input
                             placeholder="john@amg.co"
@@ -57,7 +56,7 @@ export default function Create() {
                             onChange={(e) => setData('email', e.target.value)} />
                         <InputError message={errors.email} />
                     </div>
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="employee password">Password</Label>
                         <Input
                             type="password"

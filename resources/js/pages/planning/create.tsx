@@ -1,8 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { CircleArrowLeft } from 'lucide-react';
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -18,7 +17,11 @@ import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create Planning',
+        title: 'Planning',
+        href: route('planning.index'),
+    },
+    {
+        title: '/',
         href: route('planning.create'),
     },
 ];
@@ -39,16 +42,13 @@ export default function Create({shifts}) {
             <Head title="Create Planning"/>
 
             <div className="m-3">
-                <Link href={route('planning.index')}>
-                    <Button variant="outline">
-                        <CircleArrowLeft  /> Back
-                    </Button>
-                </Link>
+                <p className="text-3xl font-bold">Create Planning</p>
             </div>
-            <div className="p-6">
+
+            <div className='w-8/12 p-4'>
                 <form onSubmit={handleSubmit} className="space-y-4">
 
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="date">Date</Label>
                         <Input
                             type="date"
@@ -58,13 +58,13 @@ export default function Create({shifts}) {
                         <InputError message={errors.date} />
                     </div>
 
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="shift">Shift</Label>
                         <Select
                             value={data.shift_id || ''}
                             onValueChange={(value) => setData('shift_id', value)}
                         >
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Shift" />
                             </SelectTrigger>
                             <SelectContent>
@@ -81,7 +81,7 @@ export default function Create({shifts}) {
                         <InputError message={errors.shift_id}/>
                     </div>
 
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="note">Note (Optional)</Label>
                         <Textarea
                             placeholder="Description"

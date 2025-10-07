@@ -1,13 +1,13 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CircleArrowLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
+import type { BreadcrumbItem } from '@/types';
 
 export default function Edit({ planning, shifts }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -16,26 +16,32 @@ export default function Edit({ planning, shifts }) {
         note: planning.note || '',
     });
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Planning',
+            href: route('planning.index'),
+        },
+        {
+            title: '/',
+            href: route('planning.edit', planning.id)}
+    ];
+
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         put(route('planning.update', planning.id));
     }
 
     return (
-        <AppLayout breadcrumbs={[{title: 'Edit Planning', href: route('planning.edit', planning.id)}]}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Planning"/>
 
             <div className="m-3">
-                <Link href={route('planning.index')}>
-                    <Button variant="outline">
-                        <CircleArrowLeft /> Back
-                    </Button>
-                </Link>
+                <p className="text-3xl font-bold">Edit Planning</p>
             </div>
 
-            <div className="p-6">
-                <form onSubmit={handleUpdate} className="space-y-4 max-w-md">
-                    <div className='gap-1.5'>
+            <div className='w-8/12 p-4'>
+                <form onSubmit={handleUpdate} className="space-y-4">
+                    <div className='space-y-2'>
                         <Label htmlFor="date">Date</Label>
                         <Input
                             type="date"
@@ -45,7 +51,7 @@ export default function Edit({ planning, shifts }) {
                         />
                         <InputError message={errors.date} />
                     </div>
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="shift">Shift</Label>
                         <Select
                             value={data.shift_id}
@@ -74,7 +80,7 @@ export default function Edit({ planning, shifts }) {
                         <InputError message={errors.shift_id} />
                     </div>
 
-                    <div className='gap-1.5'>
+                    <div className='space-y-2'>
                         <Label htmlFor="note">Note (Optional)</Label>
                         <Textarea
                             placeholder="Description"
