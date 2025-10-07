@@ -141,7 +141,6 @@ export default function Reports({ report, filters, employees, isAdmin }) {
                                 <TableBody>
                                     {report.map((r, i) => (
                                         <TableRow key={i}>
-                                            {/* Tanggal */}
                                             <TableCell>
                                                 {r.date
                                                     ? new Date(r.date).toLocaleDateString('id-ID', {

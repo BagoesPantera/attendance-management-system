@@ -83,7 +83,7 @@ class ReportController extends Controller
                 'date' => $planning->date,
                 'employee_name' => $planning->user->name,
                 'shift_name' => $planning->shift->name,
-                'shift_time' => $planning->shift->start_time . ' - ' . $planning->shift->end_time,
+                'shift_time' => substr($planning->shift->start_time, 0, 5) . ' - ' . substr($planning->shift->end_time, 0, 5),
                 'status' => $status,
                 'is_late' => $isLate ? 'Yes (' . $lateTime . ')' : 'No',
                 'early_in' => $earlyIn ? 'Yes (' . $earlyInTime . ')' : 'No',
