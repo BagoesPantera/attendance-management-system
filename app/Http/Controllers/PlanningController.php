@@ -67,8 +67,18 @@ class PlanningController extends Controller
         if ($planning->user_id !== Auth::id()) {
             return redirect()->route('planning.index');
         }
+
         $shifts = Shift::all();
-        return Inertia::render('planning/edit', compact('planning', 'shifts'));
+
+        return Inertia::render('planning/edit', [
+            'planning' => [
+                'id' => $planning->id,
+                'date' => $planning->date->format('Y-m-d'),
+                'shift_id' => $planning->shift_id,
+                'note' => $planning->note,
+            ],
+            'shifts' => $shifts
+        ]);
     }
 
     /**

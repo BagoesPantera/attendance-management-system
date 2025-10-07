@@ -36,7 +36,7 @@ class UpdatePlanningRequest extends FormRequest
                         return $query->where('user_id', auth()->id())
                             ->where('date', $this->date);
                     })
-                    ->ignore($this->route('id'))
+                    ->ignore($this->route('planning'))
             ],
             'note' => 'nullable|string|max:500',
         ];

@@ -11,7 +11,7 @@ import type { BreadcrumbItem } from '@/types';
 
 export default function Edit({ planning, shifts }) {
     const { data, setData, put, processing, errors } = useForm({
-        date: planning.date ? planning.date.split('T')[0] : '',
+        date: planning.date,
         shift_id: planning.shift_id?.toString() || '',
         note: planning.note || '',
     });
