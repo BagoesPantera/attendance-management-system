@@ -143,7 +143,7 @@ export default function Reports({ report, filters, employees, isAdmin }) {
                                         <TableRow key={i}>
                                             <TableCell>
                                                 {r.date
-                                                    ? new Date(r.date).toLocaleDateString('id-ID', {
+                                                    ? new Date(r.date).toLocaleDateString('en-EN', {
                                                         day: '2-digit',
                                                         month: 'short',
                                                         year: 'numeric',

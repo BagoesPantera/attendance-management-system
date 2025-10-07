@@ -3,7 +3,13 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Plus, SquarePen, Trash } from 'lucide-react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    Plus,
+    SquarePen,
+    Trash,
+} from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,6 +29,22 @@ export default function Index({users}) {
             router.delete(route('employees.destroy', id));
         }
     }
+
+    const handlePrevious = () => {
+        if (users.links[0].url) {
+            router.visit(users.links[0].url);
+        }
+    };
+
+    const handleNext = () => {
+        if (users.links[users.links.length - 1].url) {
+            router.visit(users.links[users.links.length - 1].url);
+        }
+    };
+
+    const handlePageClick = (url: string) => {
+        router.visit(url);
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Employee" />
@@ -45,10 +67,12 @@ export default function Index({users}) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {
-                            users.map((user, i) => (
+                        {users.data.length > 0 ? (
+                            users.data.map((user, i) => (
                                 <TableRow key={user.id}>
-                                    <TableCell className="font-medium">{i + 1}</TableCell>
+                                    <TableCell className="font-medium">
+                                        {users.from + i}
+                                    </TableCell>
                                     <TableCell>{user.name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>
@@ -61,9 +85,63 @@ export default function Index({users}) {
                                     </TableCell>
                                 </TableRow>
                             ))
-                        }
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center py-8">
+                                    No employees found
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
+
+                {/* Pagination */}
+                {users.total > users.per_page && (
+                    <div className="flex items-center justify-between mt-6">
+                        <div className="text-sm text-gray-500">
+                            Showing {users.from} to {users.to} of {users.total} results
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            {/* Previous Button */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handlePrevious}
+                                disabled={!users.links[0].url}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                Previous
+                            </Button>
+
+                            {/* Page Numbers */}
+                            <div className="flex space-x-1">
+                                {users.links.slice(1, -1).map((link: any, index: number) => (
+                                    <Button
+                                        key={index}
+                                        variant={link.active ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => handlePageClick(link.url)}
+                                        disabled={!link.url}
+                                    >
+                                        {link.label}
+                                    </Button>
+                                ))}
+                            </div>
+
+                            {/* Next Button */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleNext}
+                                disabled={!users.links[users.links.length - 1].url}
+                            >
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </AppLayout>
     )

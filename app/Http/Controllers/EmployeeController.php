@@ -18,7 +18,7 @@ class EmployeeController extends Controller
      */
     public function index(): Response
     {
-        $users = User::where('role', 'employee')->get();
+        $users = User::where('role', 'employee')->paginate(8);
         return Inertia::render('employee/index', ['users' => $users]);
     }
 
