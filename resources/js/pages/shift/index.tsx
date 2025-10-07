@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, SquarePen, Trash } from 'lucide-react';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { BreadcrumbItem } from '@/types';
+import { useConfirmDelete } from '@/hooks/use-confirm-delete';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,14 +14,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({shifts}){
+    const { confirmDelete } = useConfirmDelete();
+
     function handleEdit(id: number) {
         router.visit(route('shift.edit', id));
     }
 
     function handleDelete(id: number) {
-        if (confirm('Yakin mau hapus?')) {
-            router.delete(route('shift.destroy', id));
-        }
+        confirmDelete(
+            () => {
+                router.delete(route('shift.destroy', id));
+            },
+            {
+                title: 'Delete Shift?',
+                text: 'This action cannot be undone.'
+            }
+        );
     }
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

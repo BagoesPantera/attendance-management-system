@@ -10,6 +10,7 @@ import {
     SquarePen,
     Trash,
 } from 'lucide-react';
+import { useConfirmDelete } from '@/hooks/use-confirm-delete';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,15 +20,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({users}) {
+    const { confirmDelete } = useConfirmDelete();
 
     function handleEdit(id: number) {
         router.visit(route('employees.edit', id));
     }
 
     function handleDelete(id: number) {
-        if (confirm('Yakin mau hapus?')) {
-            router.delete(route('employees.destroy', id));
-        }
+        confirmDelete(
+            () => {
+                router.delete(route('employees.destroy', id));
+            },
+            {
+                title: 'Delete Employee?',
+                text: 'This action cannot be undone.'
+            }
+        );
     }
 
     const handlePrevious = () => {
