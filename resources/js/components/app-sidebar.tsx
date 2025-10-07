@@ -33,7 +33,7 @@ export function AppSidebar() {
         },
         {
             title: 'Report',
-            href: route('report.index'),
+            href: {url: '/report', method: 'get'},
             icon: CalendarDays,
         },
     ];
@@ -42,12 +42,12 @@ export function AppSidebar() {
         mainNavItems.push(
             {
                 title: 'Employee',
-                href: route('employees.index'),
+                href: {url: '/employees', method: 'get'},
                 icon: BookUser,
             },
             {
                 title: 'Shift',
-                href: route('shift.index'),
+                href: {url: '/shift', method: 'get'},
                 icon: CalendarClock ,
             },
         );
@@ -57,7 +57,7 @@ export function AppSidebar() {
         mainNavItems.push(
             {
                 title: 'Planning',
-                href: route('planning.index'),
+                href: {url: '/planning', method: 'get'},
                 icon: Route,
             },
         );
