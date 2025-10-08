@@ -7,10 +7,13 @@ import {
     ChevronLeft,
     ChevronRight,
     Plus,
+    Search,
     SquarePen,
     Trash,
 } from 'lucide-react';
 import { useConfirmDelete } from '@/hooks/use-confirm-delete';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,8 +22,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({users}) {
+export default function Index({users, filters}) {
     const { confirmDelete } = useConfirmDelete();
+    const [search, setSearch] = useState(filters.search || '');
+
+    function handleSearch() {
+        const params = {
+            search,
+        }
+
+        router.get(route('employees.index', params));
+    }
 
     function handleEdit(id: number) {
         router.visit(route('employees.edit', id));
@@ -57,7 +69,18 @@ export default function Index({users}) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Employee" />
             <div className="p-4">
-                <div className="flex justify-end">
+                <div className="flex justify-between space-x-4 items-center">
+                    <div className="flex space-x-2">
+                        <Input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <Button onClick={handleSearch}>
+                            <Search />
+                        </Button>
+                    </div>
+
                     <Link href={route('employees.create')}>
                         <Button size="sm">
                             <Plus /> Add Employee

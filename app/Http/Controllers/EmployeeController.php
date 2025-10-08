@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
@@ -14,12 +15,27 @@ use Inertia\Response;
 class EmployeeController extends Controller
 {
     /**
+     * @param Request $request
      * @return Response
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $users = User::where('role', 'employee')->paginate(8);
-        return Inertia::render('employee/index', ['users' => $users]);
+        $search = $request->get('search', '');
+
+        $users = User::where('role', 'employee')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(8)
+            ->withQueryString();
+
+        return Inertia::render('employee/index', [
+            'users' => $users,
+            'filters' => $request->only(['search']),
+        ]);
     }
 
     /**
