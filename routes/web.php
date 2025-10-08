@@ -4,7 +4,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ShiftAttendanceController;
 use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,8 +20,10 @@ Route::middleware('auth')->controller(DashboardController::class)->prefix('dashb
     Route::get('/', 'index')->name('dashboard');
 
     // For Employee
-    Route::post('/shift/start/{planning}', 'startShift')->name('dashboard.shift.start');
-    Route::post('/shift/end/{planning}', 'endShift')->name('dashboard.shift.end');
+    Route::middleware('is-employee')->group(function () {
+        Route::post('/shift/start/{planning}', 'startShift')->name('dashboard.shift.start');
+        Route::post('/shift/end/{planning}', 'endShift')->name('dashboard.shift.end');
+    });
 });
 
 Route::middleware(['auth', 'is-admin'])->prefix('employees')->controller(EmployeeController::class)->group(function () {
@@ -38,7 +39,7 @@ Route::middleware(['auth'])->prefix('report')->controller(ReportController::clas
     Route::get('/', 'index')->name('report.index');
 });
 
-Route::middleware('auth')->controller(PlanningController::class)->prefix('planning')->group(function () {
+Route::middleware(['auth', 'is-employee'])->controller(PlanningController::class)->prefix('planning')->group(function () {
     Route::get('/', 'index')->name('planning.index');
     Route::get('/create','create')->name('planning.create');
     Route::post('/','store')->name('planning.store');
@@ -54,13 +55,6 @@ Route::middleware(['auth', 'is-admin'])->prefix('shift')->controller(ShiftContro
     Route::get('/{shift}/edit','edit')->name('shift.edit');
     Route::put('/{shift}','update')->name('shift.update');
     Route::delete('/{shift}','destroy')->name('shift.destroy');
-});
-
-Route::middleware(['auth'])->prefix('shift-attendance')->controller(ShiftAttendanceController::class)->group(function () {
-    Route::get('/', 'index')->name('shift-attendance.index');
-    Route::get('/create','create')->name('shift-attendance.create');
-    Route::post('/start','start')->name('shift-attendance.start');
-    Route::post('/end','end')->name('shift-attendance.end');
 });
 
 require __DIR__.'/settings.php';
