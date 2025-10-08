@@ -36,6 +36,7 @@ composer run dev
 
 ## Default Access
 
-| Role | Email           | Password |
-|------|-----------------|----------|
-| Admin | admin@admin.com | 123      |
+| Role     | Email       | Password |
+|----------|-------------|----------|
+| Admin    | admin@admin | 123      |
+| Employee | a@a         | 123      |
